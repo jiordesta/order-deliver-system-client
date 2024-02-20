@@ -1,13 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { create_product } from "../redux/reducers/product_slice";
+import {
+  create_product,
+  fetch_products,
+  update_product,
+} from "../redux/reducers/product_slice";
 import { error, success } from "../redux/reducers/notification_slice";
 import Loader from "../components/Loader";
 
 export default function AdminDashboard() {
   const [showAdd, setShowAdd] = useState(false);
-
+  const { products } = useSelector((state) => state.product);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetch_products());
+  }, []);
 
   const Order = () => {
     return (
@@ -35,17 +43,40 @@ export default function AdminDashboard() {
     );
   };
 
-  const Product = () => {
+  const Product = ({ name, price, desc, status, _id }) => {
+    const [loading, setLoading] = useState(false);
+
+    const handleUpdate = () => {
+      setLoading(true);
+      dispatch(update_product(_id)).then((res) => {
+        if (res.error) {
+          dispatch(error(res.error.message));
+        } else {
+          dispatch(success("Updated"));
+          dispatch(fetch_products());
+        }
+        setLoading(false);
+      });
+    };
+
     return (
-      <div className="bg-black bg-opacity-25 rounded-lg text-white p-4">
+      <div className="bg-black relative bg-opacity-25 rounded-lg text-white p-4">
         <div className="flex justify-between">
-          <h1 className="text-xl">Name</h1>
-          <h1>$99.69</h1>
+          <h1 className="text-xl">{name}</h1>
+          <h1>{`$${price}`}</h1>
         </div>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias
-          adipisci velit dignissimos sapiente consequatur optio!
-        </p>
+        <p>{desc}</p>
+        <button
+          className="bg-black w-full bg-opacity-50 hover:bg-opacity-75 p-1 rounded-lg mt-2"
+          onClick={() => handleUpdate()}
+        >
+          {status}
+        </button>
+        {loading && (
+          <div className="absolute inset-0  flex flex-col justify-center items-center bg-black bg-opacity-50 rounded-lg">
+            <Loader w={120} h={120} />
+          </div>
+        )}
       </div>
     );
   };
@@ -103,7 +134,7 @@ export default function AdminDashboard() {
             </button>
           </div>
           {loading_create && (
-            <div className="absolute inset-0  flex flex-col justify-center items-center bg-black bg-opacity-25">
+            <div className="absolute inset-0  flex flex-col justify-center items-center bg-black bg-opacity-25 rounded-lg">
               <Loader />
             </div>
           )}
@@ -135,18 +166,16 @@ export default function AdminDashboard() {
         {showAdd ? (
           <AddNewProduct />
         ) : (
-          <ul className="flex flex-col gap-4 overflow-auto h-full mt-4">
-            <li>
-              <Product />
-            </li>
-            <li>
-              <Product />
-            </li>
+          <ul className="flex flex-col gap-4 overflow-auto h-[615px] mt-4">
+            {products.map((product) => {
+              return (
+                <li key={product._id}>
+                  <Product {...product} />
+                </li>
+              );
+            })}
           </ul>
         )}
-      </div>
-      <div className="w-full bg-color2 bg-opacity-50 h-full rounded-lg">
-        dasd
       </div>
     </div>
   );
