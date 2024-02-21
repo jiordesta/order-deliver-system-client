@@ -9,7 +9,9 @@ import CustomerDashboard from "../sections/CustomerDashboard";
 import RiderDashboard from "../sections/RiderDashboard";
 
 export default function Homepage() {
-  const { user, loading_user } = useSelector((state) => state.user);
+  const { user, loading_user, loading_logout } = useSelector(
+    (state) => state.user
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -18,7 +20,7 @@ export default function Homepage() {
 
   return (
     <>
-      {loading_user ? (
+      {loading_user || loading_logout ? (
         <div className="bg-image flex justify-center items-center">
           <Loader />
         </div>

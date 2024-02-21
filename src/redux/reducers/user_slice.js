@@ -6,6 +6,7 @@ const initialState = {
     loading_login: false,
     loading_register: false,
     loading_user: false,
+    loading_logout: false
 
 }
 
@@ -13,6 +14,15 @@ export const login = createAsyncThunk('/login', async (inputs) => {
     try {
         const {username, password} = inputs
         await AxiosInstance.post('/user/login',{username, password})
+        return
+    } catch (error) {
+        throw new Error(error.response.data.message)
+    }
+})
+
+export const logout = createAsyncThunk('/logout', async () => {
+    try {
+        await AxiosInstance.patch('/user/logout')
         return
     } catch (error) {
         throw new Error(error.response.data.message)
@@ -75,6 +85,17 @@ const userSlice = createSlice({
         })
         builder.addCase(register.fulfilled, (state) => {
             state.loading_register = false
+        })
+
+        builder.addCase(logout.pending, (state) => {
+            state.loading_logout = true
+        })
+        builder.addCase(logout.rejected, (state) => {
+            state.loading_logout = false
+        })
+        builder.addCase(logout.fulfilled, (state) => {
+            state.loading_logout = false
+            state.user = null
         })
     }
 })
