@@ -110,11 +110,6 @@ export default function CustomerDashboard() {
               );
             })}
           </ul>
-          {loading_products && (
-            <div className="absolute inset-0  flex flex-col justify-center items-center bg-black bg-opacity-50 rounded-lg">
-              <Loader />
-            </div>
-          )}
         </div>
         <div className="w-full relative bg-color2 bg-opacity-50 overflow-auto h-full rounded-lg p-4 flex flex-col gap-6">
           <ul className="flex flex-col gap-2 h-[85%] bg-black bg-opacity-25 rounded-lg p-4">
@@ -179,11 +174,6 @@ export default function CustomerDashboard() {
               );
             })}
           </ul>
-          {loading_orders && (
-            <div className="absolute inset-0  flex flex-col justify-center items-center bg-black bg-opacity-50 rounded-lg">
-              <Loader />
-            </div>
-          )}
         </div>
       </div>
     </>

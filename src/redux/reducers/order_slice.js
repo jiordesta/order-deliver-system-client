@@ -43,9 +43,27 @@ export const fetch_my_orders = createAsyncThunk('/fetch_my_orders', async () => 
     }
 })
 
-export const update_status = createAsyncThunk('/update_status/:id', async ({id, status}) => {
+export const update_status = createAsyncThunk('/update_status/:id/:status', async ({id, status}) => {
     try {
-        await AxiosInstance.patch(`/order/update_status/${id}`, {status})
+        await AxiosInstance.patch(`/order/update_status/${id}/${status}`)
+        return
+    } catch (error) {
+        throw new Error(error.response.data.message)
+    }
+})
+
+export const delete_order = createAsyncThunk('/delete_order/:id', async (id) => {
+    try {
+        await AxiosInstance.delete(`/order/delete_order/${id}`)
+        return
+    } catch (error) {
+        throw new Error(error.response.data.message)
+    }
+})
+
+export const deliver_order = createAsyncThunk('/deliver_order/:id', async (id) => {
+    try {
+        await AxiosInstance.patch(`/order/deliver_order/${id}`)
         return
     } catch (error) {
         throw new Error(error.response.data.message)

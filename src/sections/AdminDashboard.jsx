@@ -9,22 +9,27 @@ import {
 import { error, success } from "../redux/reducers/notification_slice";
 import Loader from "../components/Loader";
 import Header from "./Header";
-import { fetch_orders, update_status } from "../redux/reducers/order_slice";
+import {
+  delete_order,
+  fetch_orders,
+  update_status,
+} from "../redux/reducers/order_slice";
 
 export default function AdminDashboard() {
   const [showAdd, setShowAdd] = useState(false);
-  const { products } = useSelector((state) => state.product);
-  const { orders } = useSelector((state) => state.order);
+  const { products, loading_products } = useSelector((state) => state.product);
+  const { orders, loading_orders } = useSelector((state) => state.order);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetch_products());
     dispatch(fetch_orders());
-  }, []);
+  }, [showAdd]);
 
-  const Order = ({ _id, customer, items, total, status }) => {
+  const Order = ({ _id, customer, items, total, status, rider }) => {
+    const [loading, setLoading] = useState(false);
     return (
-      <div className="bg-black bg-opacity-25 p-4 rounded-lg text-white flex flex-col gap-4">
+      <div className="bg-black relative bg-opacity-25 p-4 rounded-lg text-white flex flex-col gap-4">
         <div className="flex justify-between items-center">
           <h1>{customer}</h1>
           <h1>{`$${parseFloat(total).toFixed(2)}`}</h1>
@@ -41,28 +46,69 @@ export default function AdminDashboard() {
           })}
         </ul>
         <div className="bg-white py-[1px]" />
-        <select
-          name="Update Status"
-          className="bg-black bg-opacity-50 p-1 rounded-lg uppercase"
-          onChange={(e) => {
-            dispatch(update_status({ id: _id, status: e.target.value })).then(
-              (res) => {
-                if (res.error) {
-                  dispatch(error(res.error.message));
-                } else {
-                  dispatch(success("Updated"));
-                  dispatch(fetch_orders());
-                }
-              }
-            );
-          }}
-          value={status}
-        >
-          <option value={"pending"}>pending</option>
-          <option value={"preparing"}>preparing</option>
-          <option value={"serving"}>serving</option>
-          <option value={"delivering"}>delivering</option>
-        </select>
+        {status == "delivering" ? (
+          <div className="flex gap-4">
+            <h1 className="bg-black p-2 bg-opacity-50 w-full rounded-lg uppercase">{`STATUS - ${status}`}</h1>
+            <h1 className="bg-black p-2 bg-opacity-50 w-full rounded-lg uppercase">
+              {`RIDER - ${rider.name}`}
+            </h1>
+          </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row w-full justify-evenly gap-4">
+            <div className="flex gap-4 justify-center items-center w-full">
+              <h1>STATUS:</h1>
+              <select
+                name="Update Status"
+                className="bg-black bg-opacity-50 p-1 rounded-lg uppercase w-full"
+                onChange={(e) => {
+                  setLoading(true);
+                  dispatch(
+                    update_status({ id: _id, status: e.target.value })
+                  ).then((res) => {
+                    if (res.error) {
+                      dispatch(error(res.error.message));
+                    } else {
+                      dispatch(success("Updated"));
+                      dispatch(fetch_orders());
+                    }
+                    setLoading(false);
+                  });
+                }}
+                value={status}
+              >
+                <option value={"pending"}>pending</option>
+                <option value={"preparing"}>preparing</option>
+                <option value={"serving"}>serving</option>
+                <option value={"delivering"}>delivering</option>
+                <option value={"delivered"}>delivered</option>
+                <option value={"cancelled"}>cancelled</option>
+              </select>
+            </div>
+            <button
+              className="bg-black bg-opacity-50  p-1 rounded-lg uppercase w-full hover:bg-opacity-75"
+              onClick={() => {
+                setLoading(true);
+                dispatch(delete_order(_id)).then((res) => {
+                  if (res.error) {
+                    dispatch(error(res.error.message));
+                  } else {
+                    dispatch(success("Deleted"));
+                    dispatch(fetch_orders());
+                  }
+                  setLoading(false);
+                });
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        )}
+
+        {loading && (
+          <div className="absolute inset-0  flex flex-col justify-center items-center bg-black bg-opacity-50 rounded-lg">
+            <Loader />
+          </div>
+        )}
       </div>
     );
   };
@@ -192,7 +238,7 @@ export default function AdminDashboard() {
     <>
       <Header />
       <div className="flex flex-col lg:flex-row items-center justify-evenly gap-4 py-16 px-4 md:px-8 lg:px-16 h-screen text-white">
-        <div className="w-full bg-color2 bg-opacity-50 overflow-auto h-full rounded-lg p-4">
+        <div className="w-full relative bg-color2 bg-opacity-50 overflow-auto h-full rounded-lg p-4">
           <ul className="flex flex-col gap-4 ">
             {orders.map((order) => {
               return (

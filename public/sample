@@ -1,0 +1,35 @@
+  {
+    name: "Gourmet Seafood Paella",
+    description: "A medley of shrimp, mussels, and calamari, perfectly seasoned and served over saffron-infused rice.",
+    price: 19.99
+  },
+  {
+    name: "Mouthwatering BBQ Pulled Pork Sandwich",
+    description: "Tender pulled pork smothered in smoky barbecue sauce, topped with coleslaw, and served on a brioche bun.",
+    price: 14.95
+  },
+  {
+    name: "Vegetarian Quinoa Buddha Bowl",
+    description: "Wholesome quinoa accompanied by roasted vegetables, avocado slices, and a zesty tahini dressing.",
+    price: 12.99
+  },
+  {
+    name: "Decadent Triple Chocolate Mousse Cake",
+    description: "Layers of rich dark chocolate, white chocolate, and milk chocolate mousse on a chocolate sponge base.",
+    price: 8.50
+  },
+  {
+    name: "Sizzling Teriyaki Salmon Skewers",
+    description: "Grilled salmon skewers glazed with a savory teriyaki sauce, garnished with sesame seeds and green onions.",
+    price: 16.75
+  },
+  {
+    name: "Crispy Panko-Crusted Chicken Tenders",
+    description: "Juicy chicken tenders coated in seasoned panko breadcrumbs, fried to perfection, and served with honey mustard dipping sauce.",
+    price: 10.99
+  },
+  {
+    name: "Refreshing Strawberry Basil Lemonade",
+    description: "A delightful blend of fresh strawberries, basil leaves, and zesty lemons, creating a sweet and tangy thirst-quencher.",
+    price: 5.75
+  },
