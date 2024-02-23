@@ -3,7 +3,12 @@ import Header from "./Header";
 import { useDispatch, useSelector } from "react-redux";
 import { fetch_products } from "../redux/reducers/product_slice";
 import Loader from "../components/Loader";
-import { create_order, fetch_my_orders } from "../redux/reducers/order_slice";
+import {
+  create_order,
+  delete_order,
+  fetch_my_orders,
+  update_status,
+} from "../redux/reducers/order_slice";
 import { error, success } from "../redux/reducers/notification_slice";
 
 export default function CustomerDashboard() {
@@ -88,9 +93,83 @@ export default function CustomerDashboard() {
             </button>
           </div>
         ) : (
-          <h1 className="bg-black bg-opacity-25 w-full text-center text-white py-1">
-            {status}
+          <h1 className="bg-black bg-opacity-25 w-full text-center text-white py-1 cursor-not-allowed">
+            not available
           </h1>
+        )}
+      </div>
+    );
+  };
+
+  const Order = ({ _id, status, items }) => {
+    const [loading, setLoading] = useState(false);
+    return (
+      <div
+        key={_id}
+        className="bg-black relative bg-opacity-50 rounded-lg p-4 flex flex-col gap-4"
+      >
+        <div className="flex w-full justify-between gap-4 items-center">
+          <h1 className="bg-black w-full bg-opacity-25 p-1 text-center rounded-lg uppercase">
+            {`STATUS : ${status}`}
+          </h1>
+          <h1 className="w-full text-end">{`TOTAL : $${parseFloat(
+            total
+          ).toFixed(2)}`}</h1>
+        </div>
+        <div className="bg-white py-[2px]" />
+        <ul>
+          {Object.keys(items).map((key) => {
+            const { _id, name, quantity } = items[key];
+            return (
+              <li key={_id}>
+                <h1>{`${quantity}x ${name}`}</h1>
+              </li>
+            );
+          })}
+        </ul>
+        {status == "pending" ? (
+          <button
+            className="bg-black w-full bg-opacity-25 p-1 text-center rounded-lg uppercase"
+            onClick={() => {
+              setLoading(true);
+              dispatch(update_status({ id: _id, status: "cancelled" })).then(
+                (res) => {
+                  if (res.error) {
+                    dispatch(error(res.error.message));
+                  } else {
+                    dispatch(success("Cancelled"));
+                    dispatch(fetch_my_orders());
+                  }
+                  setLoading(false);
+                }
+              );
+            }}
+          >
+            cancel
+          </button>
+        ) : status == "cancelled" ? (
+          <button
+            className="bg-black w-full bg-opacity-25 p-1 text-center rounded-lg uppercase"
+            onClick={() => {
+              setLoading(true);
+              dispatch(delete_order(_id)).then((res) => {
+                if (res.error) {
+                  dispatch(error(res.error.message));
+                } else {
+                  dispatch(success("Deleted"));
+                  dispatch(fetch_my_orders());
+                }
+                setLoading(false);
+              });
+            }}
+          >
+            delete
+          </button>
+        ) : null}
+        {loading && (
+          <div className="absolute inset-0  flex flex-col justify-center items-center bg-black bg-opacity-50 rounded-lg">
+            <Loader />
+          </div>
         )}
       </div>
     );
@@ -145,31 +224,11 @@ export default function CustomerDashboard() {
         </div>
         <div className="w-full relative bg-color2 bg-opacity-50 overflow-auto h-full rounded-lg p-4 flex flex-col gap-6">
           <ul className="flex flex-col gap-4 h-full">
-            {orders.map(({ _id, status, items, total }) => {
+            {orders.map((order) => {
+              const { _id } = order;
               return (
-                <li
-                  key={_id}
-                  className="bg-black bg-opacity-50 rounded-lg p-4 flex flex-col gap-4"
-                >
-                  <div className="flex w-full justify-between gap-4 items-center">
-                    <h1 className="bg-black w-full bg-opacity-25 p-1 text-center rounded-lg">
-                      {`STATUS : ${status}`}
-                    </h1>
-                    <h1 className="w-full text-end">{`TOTAL : $${parseFloat(
-                      total
-                    ).toFixed(2)}`}</h1>
-                  </div>
-                  <div className="bg-white py-[2px]" />
-                  <ul>
-                    {Object.keys(items).map((key) => {
-                      const { _id, name, quantity } = items[key];
-                      return (
-                        <li key={_id}>
-                          <h1>{`${quantity}x ${name}`}</h1>
-                        </li>
-                      );
-                    })}
-                  </ul>
+                <li key={_id}>
+                  <Order {...order} />
                 </li>
               );
             })}

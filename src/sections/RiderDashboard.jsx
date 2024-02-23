@@ -57,7 +57,7 @@ export default function RiderDashboard() {
             >
               Deliver
             </button>
-          ) : (
+          ) : status == "delivering" ? (
             <button
               className="bg-black bg-opacity-50  p-1 rounded-lg uppercase w-full hover:bg-opacity-75"
               onClick={() => {
@@ -75,8 +75,12 @@ export default function RiderDashboard() {
                 );
               }}
             >
-              Delivered
+              set as Delivered
             </button>
+          ) : (
+            <h1 className="bg-black bg-opacity-25  p-1 rounded-lg uppercase w-full text-center cursor-not-allowed">
+              {status}
+            </h1>
           )}
         </div>
         {loading && (
@@ -92,8 +96,21 @@ export default function RiderDashboard() {
     <>
       <Header />
       <div className="flex flex-col lg:flex-row items-end gap-4 py-16 px-4 md:px-8 lg:px-16 h-screen text-white">
-        <div className="w-full relative bg-color2 bg-opacity-50  h-full rounded-lg p-4 flex gap-4">
-          <ul className="flex flex-col gap-4 w-full overflow-auto">
+        <div className="w-full  flex-col lg:flex-row  relative h-full rounded-lg p-4 flex gap-4">
+          <ul className="flex bg-color1 bg-opacity-25 rounded-lg p-4 flex-col gap-4 w-full overflow-auto">
+            {orders
+              .filter((order) =>
+                ["pending", "preparing"].includes(order.status)
+              )
+              .map((order) => {
+                return (
+                  <li key={order._id}>
+                    <Order {...order} />
+                  </li>
+                );
+              })}
+          </ul>
+          <ul className="flex flex-col bg-color1 bg-opacity-25 rounded-lg p-4 gap-4 w-full overflow-auto">
             {orders
               .filter((order) => order.status === "serving")
               .map((order) => {
@@ -104,7 +121,7 @@ export default function RiderDashboard() {
                 );
               })}
           </ul>
-          <ul className="flex flex-col gap-4 overflow-auto w-1/2">
+          <ul className="flex flex-col gap-4 bg-color1 bg-opacity-25 rounded-lg p-4 overflow-auto w-full">
             {orders
               .filter(
                 (order) =>

@@ -47,12 +47,9 @@ export default function AdminDashboard() {
         </ul>
         <div className="bg-white py-[1px]" />
         {status == "delivering" ? (
-          <div className="flex gap-4">
-            <h1 className="bg-black p-2 bg-opacity-50 w-full rounded-lg uppercase">{`STATUS - ${status}`}</h1>
-            <h1 className="bg-black p-2 bg-opacity-50 w-full rounded-lg uppercase">
-              {`RIDER - ${rider.name}`}
-            </h1>
-          </div>
+          <h1 className="bg-black p-2 bg-opacity-50 w-full rounded-lg uppercase">
+            {`RIDER - ${rider.name}`}
+          </h1>
         ) : (
           <div className="flex flex-col lg:flex-row w-full justify-evenly gap-4">
             <div className="flex gap-4 justify-center items-center w-full">
@@ -240,13 +237,28 @@ export default function AdminDashboard() {
       <div className="flex flex-col lg:flex-row items-center justify-evenly gap-4 py-16 px-4 md:px-8 lg:px-16 h-screen text-white">
         <div className="w-full relative bg-color2 bg-opacity-50 overflow-auto h-full rounded-lg p-4">
           <ul className="flex flex-col gap-4 ">
-            {orders.map((order) => {
-              return (
-                <li key={order._id}>
-                  <Order {...order} />
-                </li>
-              );
-            })}
+            {orders
+              .filter((order) => !order.rider)
+              .map((order) => {
+                return (
+                  <li key={order._id}>
+                    <Order {...order} />
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
+        <div className="w-full relative bg-color2 bg-opacity-50 overflow-auto h-full rounded-lg p-4">
+          <ul className="flex flex-col gap-4 ">
+            {orders
+              .filter((order) => order.rider)
+              .map((order) => {
+                return (
+                  <li key={order._id}>
+                    <Order {...order} />
+                  </li>
+                );
+              })}
           </ul>
         </div>
         <div className="w-full relative bg-color2 bg-opacity-50  overflow-auto h-full  rounded-lg p-4">
